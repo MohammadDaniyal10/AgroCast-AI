@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroCast AI - Predict Crop Price</title>
+    <link rel="stylesheet" href="main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; min-height: 100vh; background: radial-gradient(1200px 600px at 20% -20%, rgba(34,211,238,0.18), transparent), radial-gradient(900px 500px at 120% 0%, rgba(14,165,233,0.18), transparent), linear-gradient(180deg, #0b1220 0%, #0a0f1a 100%); font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+        .predict-wrapper { max-width: 1040px; margin: 56px auto; padding: 0 16px; }
+        .predict-card { position: relative; background: rgba(13, 17, 23, 0.75); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: 1px solid rgba(148, 163, 184, 0.15); border-radius: 18px; padding: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05); overflow: hidden; }
+        .predict-card:before { content: ''; position: absolute; inset: -1px; border-radius: 18px; background: linear-gradient(135deg, rgba(34,211,238,0.12), rgba(14,165,233,0.12)); mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000); -webkit-mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000); -webkit-mask-composite: xor; mask-composite: exclude; padding: 1px; pointer-events: none; }
+        .predict-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .predict-title { font-size: 28px; font-weight: 800; letter-spacing: 0.2px; color: #e5e7eb; }
+        .back-link { color: #38bdf8; text-decoration: none; font-weight: 700; transition: opacity .15s ease; }
+        .back-link:hover { opacity: .9; }
+        .predict-desc { color: #a3aed0; margin-bottom: 18px; }
+        .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+        .col-6 { grid-column: span 6; }
+        .col-4 { grid-column: span 4; }
+        .col-3 { grid-column: span 3; }
+        .col-12 { grid-column: span 12; }
+        .form-field { position: relative; }
+        .field-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: .7; font-size: 16px; }
+        label { display: block; color: #cbd5e1; font-weight: 700; margin-bottom: 8px; letter-spacing: .2px; }
+        select, input[type=number] { width: 100%; background: #0b1220; border: 1px solid #223047; color: #e5e7eb; padding: 12px 14px 12px 36px; border-radius: 12px; outline: none; transition: border-color .2s ease, box-shadow .2s ease; }
+        select:focus, input[type=number]:focus { border-color: #22d3ee; box-shadow: 0 0 0 3px rgba(34,211,238,0.18); }
+        .btn-row { display: flex; gap: 12px; align-items: center; margin-top: 12px; }
+        .btn-primary-3d { position: relative; background: linear-gradient(135deg, #22d3ee, #0ea5e9); color: #081018; border: 0; padding: 13px 20px; border-radius: 12px; font-weight: 800; letter-spacing: .3px; cursor: pointer; transform: translateY(0); transition: transform .08s ease, filter .15s ease; }
+        .btn-primary-3d:hover { filter: brightness(1.08); }
+        .btn-primary-3d:active { transform: translateY(1px); }
+        .muted { color: #94a3b8; font-size: 14px; }
+        .tips { background: rgba(10, 15, 26, 0.7); border: 1px dashed #1f2937; border-radius: 12px; padding: 12px; color: #a3aed0; }
+        .badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 9999px; font-size: 12px; font-weight: 700; color: #0b1220; background: linear-gradient(135deg, #22d3ee, #0ea5e9); }
+        .header-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+        @media (max-width: 768px) { .col-6, .col-4, .col-3 { grid-column: span 12; } .predict-wrapper { margin: 32px auto; } }
+    </style>
+</head>
+<body>
+    <div class="predict-wrapper">
+        <div class="predict-card">
+            <div class="header-row">
+                <div class="predict-title">Predict Crop Price</div>
+                <span class="badge">⚡ Real-time ML</span>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px;">
+                <p class="predict-desc" style="margin:0;">Enter details to get min/avg/max price and yearly analysis. Results open in a new tab.</p>
+                <a class="back-link" href="index.html">← Back</a>
+            </div>
+
+            <form id="predict-form" action="http://127.0.0.1:5000/result" method="post" target="_blank">
+                <div class="grid">
+                    <div class="col-6">
+                        <label for="commodityname">Commodity</label>
+                        <div class="form-field">
+                            <span class="field-icon">🌾</span>
+                            <select id="commodityname" name="commodityname" required>
+                            <option value="">Select commodity</option>
+                            <option value="Jowar">Jowar</option>
+                            <option value="Wheat">Wheat</option>
+                            <option value="Bajara">Bajara</option>
+                            <option value="Sugarcane">Sugarcane</option>
+                            <option value="Cotton">Cotton</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-3 col-4">
+                        <label for="month">Month (1-12)</label>
+                        <div class="form-field">
+                            <span class="field-icon">📅</span>
+                            <input id="month" name="month" type="number" min="1" max="12" placeholder="e.g. 7" required>
+                        </div>
+                    </div>
+                    <div class="col-3 col-4">
+                        <label for="year">Year</label>
+                        <div class="form-field">
+                            <span class="field-icon">🗓</span>
+                            <input id="year" name="year" type="number" placeholder="e.g. 2025" required>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label for="average_rain_fall">Average Rainfall (mm)</label>
+                        <div class="form-field">
+                            <span class="field-icon">🌧</span>
+                            <input id="average_rain_fall" name="average_rain_fall" type="number" step="any" placeholder="e.g. 67.6" required>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="btn-row">
+                            <button type="submit" class="btn-primary-3d"><span>Predict Price</span></button>
+                            <span class="muted">Powered by Flask backend on 127.0.0.1:5000</span>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="tips">Tip: If you run the backend elsewhere, change the form action URL accordingly.</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            var yearInput = document.getElementById('year');
+            if (yearInput && !yearInput.value) {
+                try { yearInput.value = new Date().getFullYear(); } catch (e) {}
+            }
+        })();
+    </script>
+</body>
+</html>
+

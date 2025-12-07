@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: agrocast-price
+    env: python
+    buildCommand: pip install -r Crop-Price-Prediction-Using-Random-Forest-main/src/requirements.txt
+    startCommand: gunicorn app:app --chdir Crop-Price-Prediction-Using-Random-Forest-main/src --workers=2 --threads=4 --timeout=120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.6
+      - key: MONGO_URL
+        value: mongodb://localhost:27017/cropdb
+  - type: web
+    name: agrocast-recommend
+    env: python
+    buildCommand: pip install -r Crop_Recommendation-main/requirements.txt
+    startCommand: gunicorn app:app --chdir Crop_Recommendation-main --workers=2 --threads=4 --timeout=120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.6
